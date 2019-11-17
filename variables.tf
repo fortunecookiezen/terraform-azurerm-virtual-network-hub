@@ -14,8 +14,9 @@ variable "address_space" {
   description = "The full address space that is used the virtual network. Requires at least a /24 address space."
 }
 
-variable "log_analytics_workspace_id" {
-  description = "Specifies the ID of a Log Analytics Workspace where Diagnostics Data should be sent."
+variable "diagnostics" {
+  description = "Diagnostic settings for those resources that support it. See README.md for details on configuration."
+  type        = object({ destination = string, eventhub_name = string, logs = list(string), metrics = list(string) })
   default     = null
 }
 
@@ -31,9 +32,21 @@ variable "dmz_nsg_rules" {
   default     = []
 }
 
+variable "public_ip_prefix_length" {
+  description = "Specifies the number of bits of the prefix. The value can be set between 24 (256 addresses) and 31 (2 addresses)."
+  type        = number
+  default     = 30
+}
+
 variable "public_ip_names" {
   description = "Public ips is a list of ip names that are connected to the firewall. At least one is required."
   type        = list(string)
+}
+
+variable "firewall_zones" {
+  description = "A collection of availability zones to spread the Firewall over."
+  type        = list(string)
+  default     = null
 }
 
 variable "firewall_application_rules" {
@@ -56,7 +69,7 @@ variable "firewall_nat_rules" {
 
 variable "netwatcher" {
   description = "Properties for creating network watcher. If set it will create Network Watcher resource using standard naming standard."
-  type        = object({ resource_group_location = string })
+  type        = object({ resource_group_location = string, log_analytics_workspace_id = string })
   default     = null
 }
 

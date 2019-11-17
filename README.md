@@ -5,7 +5,7 @@ This module deploys a hub network using the [Microsoft recommended Hub-Spoke net
 The virtual network will be created with 4 subnets, AzureFirewallSubnet, GatewaySubnet, Management and DMZ. AzureFirewallSubnet and GatewaySubnet will not contain any UDR (User Defined Route) or NSG (Network Security Group) since that is not possible with resources deployed in those subnets. Management and DMZ will route all outgoing traffic through firewall instance.
 
 ![hub topology](images/hub-spoke.png)
-Source: https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke
+Source: <https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke>
 
 In diagram hub network is connected to on-premise network, but works just as well with public network.
 
@@ -40,7 +40,13 @@ inputs {
     resource_group_name = "networking-hub-rg"
     location = "westeurope"
     address_space = "10.0.0.0/24"
-    log_analytics_workspace_id = "/subscription/xxxx-xxxx/.../resource_id"
+
+    diagnostics = {
+        destination = "/subscription/xxxx-xxxx/.../resource_id"
+        eventhub_name = null
+        logs = ["all"]
+        metrics = ["all"]
+    }
 
     management_nsg_rules = [
     {
@@ -104,6 +110,12 @@ inputs {
 
 }
 ```
+
+## Diagnostics
+
+Diagnostics settings can be sent to either storage account, event hub or Log Analytics workspace. The variable `diagnostics.destination` is the id of receiver, ie. storage account id, event namespace authorization rule id or log analytics resource id. Depending on what id is it will detect where to send. Unless using event namespace the `eventhub_name` is not required, just set to `null` for storage account and log analytics workspace.
+
+Setting `all` in logs and metrics will send all possible diagnostics to destination. If not using `all` type name of categories to send.
 
 ## DDos protection plan
 
